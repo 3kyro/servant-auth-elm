@@ -4567,9 +4567,6 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
-var $author$project$App$CookieUpdate = function (a) {
-	return {$: 'CookieUpdate', a: a};
-};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5363,7 +5360,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$App$initCmd = $elm$core$Platform$Cmd$none;
 var $author$project$App$initModel = function (cookies) {
-	return {cookies: cookies, email: '', password: '', showPassword: false, username: ''};
+	return {cookies: cookies, output: '', password: '', showPassword: false, username: ''};
 };
 var $author$project$App$init = function (cookies) {
 	return _Utils_Tuple2(
@@ -5371,7 +5368,13 @@ var $author$project$App$init = function (cookies) {
 		$author$project$App$initCmd);
 };
 var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$App$CookieUpdate = function (a) {
+	return {$: 'CookieUpdate', a: a};
+};
 var $author$project$App$toElm = _Platform_incomingPort('toElm', $elm$json$Json$Decode$string);
+var $author$project$App$subscriptions = function (model) {
+	return $author$project$App$toElm($author$project$App$CookieUpdate);
+};
 var $author$project$App$ReceivedEmail = function (a) {
 	return {$: 'ReceivedEmail', a: a};
 };
@@ -6262,6 +6265,18 @@ var $author$project$App$getEmailRequest = function (model) {
 			xsrfToken: A2($author$project$Http$XSRF$token, 'XSRF-TOKEN=', model.cookies)
 		});
 };
+var $author$project$App$ReceivedName = function (a) {
+	return {$: 'ReceivedName', a: a};
+};
+var $author$project$App$getNameRequest = function (model) {
+	return $author$project$Http$XSRF$authGet(
+		{
+			expect: A2($elm$http$Http$expectJson, $author$project$App$ReceivedName, $elm$json$Json$Decode$string),
+			url: 'http://localhost:4000/name',
+			xsrfHeaderName: 'X-XSRF-TOKEN',
+			xsrfToken: A2($author$project$Http$XSRF$token, 'XSRF-TOKEN=', model.cookies)
+		});
+};
 var $author$project$App$LoginResponse = function (a) {
 	return {$: 'LoginResponse', a: a};
 };
@@ -6357,17 +6372,35 @@ var $author$project$App$update = F2(
 				var username = msg.a;
 				var password = msg.b;
 				return _Utils_Tuple2(
+					model,
+					A2($author$project$App$login, username, password));
+			case 'LoginResponse':
+				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{password: '', username: ''}),
-					A2($author$project$App$login, username, password));
-			case 'LoginResponse':
-				var rlt = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					$elm$core$Platform$Cmd$none);
+			case 'GetName':
+				return _Utils_Tuple2(
+					model,
+					$author$project$App$getNameRequest(model));
 			case 'GetEmail':
 				return _Utils_Tuple2(
 					model,
 					$author$project$App$getEmailRequest(model));
+			case 'ReceivedName':
+				var rlt = msg.a;
+				if (rlt.$ === 'Err') {
+					var err = rlt.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var name = rlt.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{output: name}),
+						$elm$core$Platform$Cmd$none);
+				}
 			case 'ReceivedEmail':
 				var rlt = msg.a;
 				if (rlt.$ === 'Err') {
@@ -6378,7 +6411,7 @@ var $author$project$App$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{email: email}),
+							{output: email}),
 						$elm$core$Platform$Cmd$none);
 				}
 			default:
@@ -6390,6 +6423,14 @@ var $author$project$App$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
+var $mdgriffith$elm_ui$Internal$Model$Height = function (a) {
+	return {$: 'Height', a: a};
+};
+var $mdgriffith$elm_ui$Element$height = $mdgriffith$elm_ui$Internal$Model$Height;
 var $mdgriffith$elm_ui$Internal$Style$classes = {above: 'a', active: 'atv', alignBottom: 'ab', alignCenterX: 'cx', alignCenterY: 'cy', alignContainerBottom: 'acb', alignContainerCenterX: 'accx', alignContainerCenterY: 'accy', alignContainerRight: 'acr', alignLeft: 'al', alignRight: 'ar', alignTop: 'at', alignedHorizontally: 'ah', alignedVertically: 'av', any: 's', behind: 'bh', below: 'b', bold: 'w7', borderDashed: 'bd', borderDotted: 'bdt', borderNone: 'bn', borderSolid: 'bs', capturePointerEvents: 'cpe', clip: 'cp', clipX: 'cpx', clipY: 'cpy', column: 'c', container: 'ctr', contentBottom: 'cb', contentCenterX: 'ccx', contentCenterY: 'ccy', contentLeft: 'cl', contentRight: 'cr', contentTop: 'ct', cursorPointer: 'cptr', cursorText: 'ctxt', focus: 'fcs', focusedWithin: 'focus-within', fullSize: 'fs', grid: 'g', hasBehind: 'hbh', heightContent: 'hc', heightExact: 'he', heightFill: 'hf', heightFillPortion: 'hfp', hover: 'hv', imageContainer: 'ic', inFront: 'fr', inputLabel: 'lbl', inputMultiline: 'iml', inputMultilineFiller: 'imlf', inputMultilineParent: 'imlp', inputMultilineWrapper: 'implw', inputText: 'it', italic: 'i', link: 'lnk', nearby: 'nb', noTextSelection: 'notxt', onLeft: 'ol', onRight: 'or', opaque: 'oq', overflowHidden: 'oh', page: 'pg', paragraph: 'p', passPointerEvents: 'ppe', root: 'ui', row: 'r', scrollbars: 'sb', scrollbarsX: 'sbx', scrollbarsY: 'sby', seButton: 'sbt', single: 'e', sizeByCapital: 'cap', spaceEvenly: 'sev', strike: 'sk', text: 't', textCenter: 'tc', textExtraBold: 'w8', textExtraLight: 'w2', textHeavy: 'w9', textJustify: 'tj', textJustifyAll: 'tja', textLeft: 'tl', textLight: 'w3', textMedium: 'w5', textNormalWeight: 'w4', textRight: 'tr', textSemiBold: 'w6', textThin: 'w1', textUnitalicized: 'tun', transition: 'ts', transparent: 'clr', underline: 'u', widthContent: 'wc', widthExact: 'we', widthFill: 'wf', widthFillPortion: 'wfp', wrapped: 'wrp'};
 var $mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
 	return {$: 'Attr', a: a};
@@ -12080,12 +12121,13 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
+var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
+	return {$: 'AlignX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
+var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
 var $mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var $mdgriffith$elm_ui$Internal$Model$asColumn = $mdgriffith$elm_ui$Internal$Model$AsColumn;
-var $mdgriffith$elm_ui$Internal$Model$Height = function (a) {
-	return {$: 'Height', a: a};
-};
-var $mdgriffith$elm_ui$Element$height = $mdgriffith$elm_ui$Internal$Model$Height;
 var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
 var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
 var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
@@ -12110,14 +12152,87 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var $mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
+var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
+	return {$: 'Px', a: a};
+};
+var $mdgriffith$elm_ui$Element$px = $mdgriffith$elm_ui$Internal$Model$Px;
+var $mdgriffith$elm_ui$Element$rgb255 = F3(
+	function (red, green, blue) {
+		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
+	});
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
 };
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $author$project$App$cookie = function (model) {
-	return $mdgriffith$elm_ui$Element$text(model.cookies);
+var $author$project$App$cookieNotigfication = function (model) {
+	var _v0 = A2($author$project$Http$XSRF$token, 'XSRF-TOKEN=', model.cookies);
+	if (_v0.$ === 'Just') {
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$height(
+					$mdgriffith$elm_ui$Element$px(50)),
+					$mdgriffith$elm_ui$Element$Background$color(
+					A3($mdgriffith$elm_ui$Element$rgb255, 116, 205, 128))
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('Authenticated')));
+	} else {
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$height(
+					$mdgriffith$elm_ui$Element$px(50)),
+					$mdgriffith$elm_ui$Element$Background$color(
+					A3($mdgriffith$elm_ui$Element$rgb255, 255, 65, 65))
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('Not Authenticated')));
+	}
 };
 var $author$project$App$GetEmail = {$: 'GetEmail'};
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
@@ -12276,9 +12391,20 @@ var $mdgriffith$elm_ui$Element$Input$button = F2(
 				_List_fromArray(
 					[label])));
 	});
+var $mdgriffith$elm_ui$Internal$Flag$fontAlignment = $mdgriffith$elm_ui$Internal$Flag$flag(12);
+var $mdgriffith$elm_ui$Element$Font$center = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontAlignment, $mdgriffith$elm_ui$Internal$Style$classes.textCenter);
+var $author$project$App$buttonAttributes = _List_fromArray(
+	[
+		$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+		$mdgriffith$elm_ui$Element$height(
+		$mdgriffith$elm_ui$Element$px(50)),
+		$mdgriffith$elm_ui$Element$Background$color(
+		A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200)),
+		$mdgriffith$elm_ui$Element$Font$center
+	]);
 var $author$project$App$emailButton = A2(
 	$mdgriffith$elm_ui$Element$Input$button,
-	_List_Nil,
+	$author$project$App$buttonAttributes,
 	{
 		label: $mdgriffith$elm_ui$Element$text('Get Email'),
 		onPress: $elm$core$Maybe$Just($author$project$App$GetEmail)
@@ -12290,13 +12416,21 @@ var $author$project$App$Login = F2(
 var $author$project$App$loginButton = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$Input$button,
-		_List_Nil,
+		$author$project$App$buttonAttributes,
 		{
 			label: $mdgriffith$elm_ui$Element$text('Login'),
 			onPress: $elm$core$Maybe$Just(
 				A2($author$project$App$Login, model.username, model.password))
 		});
 };
+var $author$project$App$GetName = {$: 'GetName'};
+var $author$project$App$nameButton = A2(
+	$mdgriffith$elm_ui$Element$Input$button,
+	$author$project$App$buttonAttributes,
+	{
+		label: $mdgriffith$elm_ui$Element$text('Get Name'),
+		onPress: $elm$core$Maybe$Just($author$project$App$GetName)
+	});
 var $author$project$App$ChangeUsername = function (a) {
 	return {$: 'ChangeUsername', a: a};
 };
@@ -12452,16 +12586,6 @@ var $mdgriffith$elm_ui$Element$Input$calcMoveToCompensateForPadding = function (
 };
 var $mdgriffith$elm_ui$Internal$Flag$overflow = $mdgriffith$elm_ui$Internal$Flag$flag(20);
 var $mdgriffith$elm_ui$Element$clip = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$overflow, $mdgriffith$elm_ui$Internal$Style$classes.clip);
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
 var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
 var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
 	return A2(
@@ -12513,10 +12637,6 @@ var $mdgriffith$elm_ui$Element$paddingXY = F2(
 		}
 	});
 var $mdgriffith$elm_ui$Element$Input$defaultTextPadding = A2($mdgriffith$elm_ui$Element$paddingXY, 12, 12);
-var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
-	return {$: 'Fill', a: a};
-};
-var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
 var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
 	return A2(
@@ -13009,23 +13129,6 @@ var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 			'color',
 			fontColor));
 };
-var $mdgriffith$elm_ui$Element$el = F2(
-	function (attrs, child) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asEl,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-					attrs)),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[child])));
-	});
 var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $mdgriffith$elm_ui$Element$Input$renderPlaceholder = F3(
 	function (_v0, forPlaceholder, on) {
@@ -13319,11 +13422,18 @@ var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$tex
 var $author$project$App$nameInput = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$Input$text,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+			]),
 		{
 			label: A2(
 				$mdgriffith$elm_ui$Element$Input$labelLeft,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$px(120))
+					]),
 				$mdgriffith$elm_ui$Element$text('User name')),
 			onChange: $author$project$App$ChangeUsername,
 			placeholder: $elm$core$Maybe$Nothing,
@@ -13349,11 +13459,18 @@ var $mdgriffith$elm_ui$Element$Input$newPassword = F2(
 var $author$project$App$pwdInput = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$Input$newPassword,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+			]),
 		{
 			label: A2(
 				$mdgriffith$elm_ui$Element$Input$labelLeft,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$px(120))
+					]),
 				$mdgriffith$elm_ui$Element$text('Password')),
 			onChange: $author$project$App$ChangePassword,
 			placeholder: $elm$core$Maybe$Nothing,
@@ -13361,22 +13478,28 @@ var $author$project$App$pwdInput = function (model) {
 			text: model.password
 		});
 };
-var $author$project$App$showEmail = function (model) {
-	return $mdgriffith$elm_ui$Element$text(model.email);
+var $author$project$App$showOutput = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(50)),
+				$mdgriffith$elm_ui$Element$Background$color(
+				A3($mdgriffith$elm_ui$Element$rgb255, 252, 153, 131))
+			]),
+		A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[$mdgriffith$elm_ui$Element$centerY, $mdgriffith$elm_ui$Element$centerX]),
+			$mdgriffith$elm_ui$Element$text(model.output)));
 };
 var $author$project$App$ShowPassword = function (a) {
 	return {$: 'ShowPassword', a: a};
 };
-var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
-	return {$: 'AlignX', a: a};
-};
 var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
-var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
-var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
 var $mdgriffith$elm_ui$Element$Input$tabindex = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Attributes$tabindex);
 var $mdgriffith$elm_ui$Element$Input$checkbox = F2(
 	function (attrs, _v0) {
@@ -13438,20 +13561,12 @@ var $mdgriffith$elm_ui$Element$Input$checkbox = F2(
 							icon(checked)
 						]))));
 	});
-var $mdgriffith$elm_ui$Internal$Flag$fontAlignment = $mdgriffith$elm_ui$Internal$Flag$flag(12);
-var $mdgriffith$elm_ui$Element$Font$center = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontAlignment, $mdgriffith$elm_ui$Internal$Style$classes.textCenter);
-var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
-var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$degrees = function (angleInDegrees) {
 	return (angleInDegrees * $elm$core$Basics$pi) / 180;
 };
 var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
-var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
-	return {$: 'Px', a: a};
-};
-var $mdgriffith$elm_ui$Element$px = $mdgriffith$elm_ui$Internal$Model$Px;
 var $mdgriffith$elm_ui$Internal$Model$Rotate = F2(
 	function (a, b) {
 		return {$: 'Rotate', a: a, b: b};
@@ -13604,31 +13719,36 @@ var $author$project$App$showPassword = function (model) {
 var $author$project$App$viewEl = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$width(
+				$mdgriffith$elm_ui$Element$px(500)),
+				$mdgriffith$elm_ui$Element$spacing(20),
+				A2($mdgriffith$elm_ui$Element$paddingXY, 0, 20)
+			]),
 		_List_fromArray(
 			[
 				$author$project$App$nameInput(model),
 				$author$project$App$pwdInput(model),
 				$author$project$App$showPassword(model),
 				$author$project$App$loginButton(model),
-				$author$project$App$cookie(model),
+				$author$project$App$cookieNotigfication(model),
+				$author$project$App$nameButton,
 				$author$project$App$emailButton,
-				$author$project$App$showEmail(model)
+				$author$project$App$showOutput(model)
 			]));
 };
 var $author$project$App$view = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill)
+			]),
 		$author$project$App$viewEl(model));
 };
 var $author$project$App$main = $elm$browser$Browser$element(
-	{
-		init: $author$project$App$init,
-		subscriptions: function (_v0) {
-			return $author$project$App$toElm($author$project$App$CookieUpdate);
-		},
-		update: $author$project$App$update,
-		view: $author$project$App$view
-	});
+	{init: $author$project$App$init, subscriptions: $author$project$App$subscriptions, update: $author$project$App$update, view: $author$project$App$view});
 _Platform_export({'App':{'init':$author$project$App$main($elm$json$Json$Decode$string)(0)}});}(this));

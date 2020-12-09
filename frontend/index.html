@@ -8,7 +8,7 @@
         <div id="myapp"></div>
         <script src="app.js"></script>
         <script>
-            // Send elm all cookies if they have changed
+            // An onChange listener for cookies
             function onCookieChange(callback, interval = 1000) {
                 let prevCookie = document.cookie;
                 setInterval(()=> {
@@ -21,13 +21,15 @@
 
             let app = Elm.App.init(
                 { node: document.getElementById("myapp")
+                // Pass all cookies to elm at initialization.
+                // Useful even if you are listening to cookie changes as you'll have the right
+                // value in elm even in page reloads.
                 , flags: document.cookie
                 }
             );
 
+            // Send changed cookies to elm
             onCookieChange( cookie => app.ports.toElm.send(cookie));
-
-
         </script>
     </body>
 </html>
