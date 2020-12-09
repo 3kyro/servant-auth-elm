@@ -1,2 +1,4 @@
 .stack-work/
 *~
+frontend/elm-stuff
+frontend/app.js
