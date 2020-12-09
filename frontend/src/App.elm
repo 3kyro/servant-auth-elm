@@ -1,4 +1,4 @@
-port module App exposing (..)
+module App exposing (..)
 
 {-
 
@@ -16,13 +16,13 @@ import Http as Http
 import Http.XSRF as XSRF
 import Json.Decode as D
 import Json.Encode as E
-import Http.XSRF as XSRF
 
 
--- main parametrised to String to receive initial cookies
+
+-- main parametrised to D.Value to receive the document object
 
 
-main : Program String Model Msg
+main : Program D.Value Model Msg
 main =
     Browser.element
         { init = init
@@ -33,28 +33,20 @@ main =
 
 
 
--- Initialize the elm runtime with the cookies loaded
+-- Initialize the elm runtime with the document object
 
 
-init : String -> ( Model, Cmd Msg )
+init : D.Value -> ( Model, Cmd Msg )
 init cookies =
-    -- initModel sets a value of Model containing the cookies String
+    -- initModel sets a value of Model containing document object
     ( initModel cookies
-    , initCmd
+    , Cmd.none
     )
-
-
-
--- Listen for the cookies listener message
-
-
-port toElm : (String -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    -- fire up CookieUpdate when you receive a mesage from javascript
-    toElm CookieUpdate
+    Sub.none
 
 
 
@@ -65,7 +57,7 @@ type alias Model =
     { username : String
     , password : String
     , showPassword : Bool
-    , cookies : String
+    , document : D.Value
     , output : String
     }
 
@@ -80,15 +72,14 @@ type Msg
     | GetEmail
     | ReceivedName (Result Http.Error String)
     | ReceivedEmail (Result Http.Error String)
-    | CookieUpdate String
 
 
-initModel : String -> Model
-initModel cookies =
+initModel : D.Value -> Model
+initModel document =
     { username = ""
     , password = ""
     , showPassword = False
-    , cookies = cookies
+    , document = document
     , output = ""
     }
 
@@ -192,7 +183,7 @@ cookieNotigfication : Model -> Element Msg
 cookieNotigfication model =
     -- In a real app, you'd have a way to keep track if the user is
     -- authenticated or not
-    case XSRF.token "XSRF-TOKEN=" model.cookies of
+    case token "XSRF-TOKEN=" model.document of
         Just _ ->
             el
                 [ width fill
@@ -305,11 +296,6 @@ update msg model =
                 Ok email ->
                     ( { model | output = email }, Cmd.none )
 
-        CookieUpdate str ->
-            ( { model | cookies = str }
-            , Cmd.none
-            )
-
 
 
 -- Requests
@@ -337,7 +323,7 @@ getNameRequest model =
         { url = "http://localhost:4000/name"
         , expect = Http.expectJson ReceivedName D.string
         , xsrfHeaderName = "X-XSRF-TOKEN"
-        , xsrfToken = XSRF.token "XSRF-TOKEN=" model.cookies
+        , xsrfToken = token "XSRF-TOKEN=" model.document
         }
 
 
@@ -351,7 +337,7 @@ getEmailRequest model =
         { url = "http://localhost:4000/email"
         , expect = Http.expectJson ReceivedEmail D.string
         , xsrfHeaderName = "X-XSRF-TOKEN"
-        , xsrfToken = XSRF.token "XSRF-TOKEN=" model.cookies
+        , xsrfToken = token "XSRF-TOKEN=" model.document
         }
 
 
@@ -365,3 +351,32 @@ encodeLogin username password =
         [ ( "username", E.string username )
         , ( "password", E.string password )
         ]
+
+
+token : String -> D.Value -> Maybe String
+token name value =
+    let
+        decodeCookie =
+            D.field "cookie" D.string
+
+        str =
+            D.decodeValue decodeCookie value
+
+        split a =
+            String.split ";" a
+
+        filtered a =
+            List.filter (String.startsWith name) [ a ]
+
+        head a =
+            List.head <| filtered a
+
+        trimmed a =
+            Maybe.map (String.dropLeft (String.length name)) <| head a
+    in
+    case str of
+        Err err ->
+            Nothing
+
+        Ok cookie ->
+            trimmed cookie
