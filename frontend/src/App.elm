@@ -16,7 +16,7 @@ import Http as Http
 import Http.XSRF as XSRF
 import Json.Decode as D
 import Json.Encode as E
-
+import Http.XSRF as XSRF
 
 
 -- main parametrised to String to receive initial cookies
@@ -333,7 +333,7 @@ login username password =
 
 getNameRequest : Model -> Cmd Msg
 getNameRequest model =
-    XSRF.authGet
+    XSRF.get
         { url = "http://localhost:4000/name"
         , expect = Http.expectJson ReceivedName D.string
         , xsrfHeaderName = "X-XSRF-TOKEN"
@@ -347,7 +347,7 @@ getNameRequest model =
 
 getEmailRequest : Model -> Cmd Msg
 getEmailRequest model =
-    XSRF.authGet
+    XSRF.get
         { url = "http://localhost:4000/email"
         , expect = Http.expectJson ReceivedEmail D.string
         , xsrfHeaderName = "X-XSRF-TOKEN"
