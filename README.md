@@ -2,7 +2,7 @@
 
 An implementation of the servant-auth [example](https://github.com/haskell-servant/servant-auth) using Elm and the [XSRF-protect](https://package.elm-lang.org/packages/3kyro/xsrf-protection/latest/Http-XSRF) package.
 
-The haskell part of the implementation tries to stay as close as poosible to the literal haskell Readme [example](https://github.com/haskell-servant/servant-auth/blob/master/servant-auth-server/README.lhs). The JWT option has been removed as its not relevant for the XSRF cookie example.
+The haskell part of the implementation tries to stay as close as possible to the literal haskell Readme [example](https://github.com/haskell-servant/servant-auth/blob/master/servant-auth-server/README.lhs). The JWT option has been removed as its not relevant for the XSRF cookie example.
 
 To run the example, first build the Elm app inside the frontend folder
 
